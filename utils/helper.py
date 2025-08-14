@@ -81,7 +81,6 @@ def send_message(phone, message, chat_id=123456):
 
 
 
-from decimal import Decimal, InvalidOperation
 
 def clean_balance(raw_balance):
     try:
@@ -95,3 +94,5 @@ def clean_balance(raw_balance):
 
     except (InvalidOperation, TypeError, ValueError):
         raise FormatError(f"Неверный баланс: {raw_balance}")
+    
+    
