@@ -1,6 +1,12 @@
 import datetime
 from decimal import Decimal, InvalidOperation
+import random
 import re
+import string
+from django.core.exceptions import ValidationError
+
+from core.models import Transfer
+
 
 class FormatError(Exception):
     pass
@@ -81,7 +87,6 @@ def send_message(phone, message, chat_id=123456):
 
 
 
-
 def clean_balance(raw_balance):
     try:
         if raw_balance is None:
@@ -95,4 +100,42 @@ def clean_balance(raw_balance):
     except (InvalidOperation, TypeError, ValueError):
         raise FormatError(f"Неверный баланс: {raw_balance}")
     
+    
+    
+def send_telegram_message(phone, message, chat_id=123456):
+    print(f"Sending message to telegramm to phone {phone}: {message}")
+    return f"Simulating message send to telegramm:'{message}' to chat ID: {chat_id}"
+    
+    
+    
+def calculate_exchange(amount, currency):
+    RATES = {643: 1, 840: 13000}
+    if currency not in RATES:
+        raise ValidationError("Invalid currency")
+    return amount * RATES[currency]
+
+
+def get_transfer_by_ext_id(ext_id):
+    return Transfer.objects.filter(ext_id=ext_id).first()
+
+
+
+def validate_card(card_number):
+    digits = []
+    for i in format_card(card_number):
+        digits.append(int(i)) 
+    checksum = 0
+    is_even = False
+    for digit in digits[::-1]:
+        if is_even:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+        checksum += digit
+        is_even = not is_even
+    return checksum % 10 == 0
+
+def generate_otp(length=6):
+    return ''.join(random.choices(string.digits, k=length))
+
     
