@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+from celery.schedules import crontab
 
 from pathlib import Path
 
@@ -27,7 +28,19 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 
+
+CELERY_BEAT_SCHEDULE = {
+    "send-daily-report": {
+        "task": "core.tasks.send_report",
+        "schedule": crontab(minute=0, hour=9),
+    },
+}
+
+CHAT_ID = "1146092798"
+TELEGRAM_TOKEN = "8312056065:AAFZNYIkDMbKytClZtus4YqftkGk6FTfOsc"
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'import_export',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -122,3 +136,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
