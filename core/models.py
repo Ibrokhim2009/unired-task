@@ -1,3 +1,5 @@
+from datetime import timezone
+from gettext import translation
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -55,7 +57,44 @@ class Transfer(models.Model):
     cancelled_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    def save(self, *args, **kwargs):
+        from core.models import Card
 
+        if self.state == self.State.CONFIRMED and not self.confirmed_at:
+            try:
+                sender = Card.objects.get(
+                    card_number=self.sender_card_number,
+                    expiry=self.sender_card_expiry
+                )
+            except Card.DoesNotExist:
+                raise ValidationError("Sender card not found")
+
+            try:
+                receiver = Card.objects.get(
+                    card_number=self.receiver_card_number
+                )
+            except Card.DoesNotExist:
+                raise ValidationError("Receiver card not found")
+
+            if sender.balance < self.sending_amount:
+                raise ValidationError("Not enough money on sender card")
+
+            sender.balance -= self.sending_amount
+            receiver.balance += self.receiving_amount
+
+            sender.save()
+            receiver.save()
+
+            from django.utils import timezone
+            self.confirmed_at = timezone.now()
+
+        if self.state == self.State.CANCELLED and not self.cancelled_at:
+            from django.utils import timezone
+            self.cancelled_at = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    
     def clean(self):
         if not Card.objects.filter(card_number=self.sender_card_number, expiry=self.sender_card_expiry, status='active').exists():
             raise ValidationError("Sender card is not active or does not exist")
