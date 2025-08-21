@@ -14,11 +14,11 @@ def jsonrpc_view(request):
         try:
             raw_body = request.body.decode('utf-8')
             response = dispatch(raw_body)
-            print("\n\n\n\n javobi  \n\n\n", response)
 
             return HttpResponse(response, content_type='application/json')
 
         except json.JSONDecodeError as e:
+            print("\n\n\n\n javobi  \n\n\n", response)
             return HttpResponse(
                 json.dumps({'error': {'code': -32700, 'message': 'Parse error', 'data': str(e)}}),
                 content_type='application/json',
