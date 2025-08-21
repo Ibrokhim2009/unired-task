@@ -1,0 +1,18 @@
+INFO 2025-08-21 10:01:59,478 log_decorator [START] transfer_confirm | IP=Unknown | Body=No body
+ERROR 2025-08-21 10:01:59,481 log_decorator [ERROR] transfer_confirm | IP=Unknown | Time=0.003s | Error='ErrorResult' object has no attribute 'get'
+INFO 2025-08-21 10:02:17,824 log_decorator [START] transfer_confirm | IP=Unknown | Body=No body
+ERROR 2025-08-21 10:02:17,826 log_decorator [ERROR] transfer_confirm | IP=Unknown | Time=0.002s | Error='ErrorResult' object has no attribute 'get'
+INFO 2025-08-21 10:03:04,577 log_decorator [START] transfer_confirm | IP=Unknown | Body=No body
+ERROR 2025-08-21 10:03:04,579 log_decorator [ERROR] transfer_confirm | IP=Unknown | Time=0.003s | Error=isinstance() arg 2 must be a type, a tuple of types, or a union
+INFO 2025-08-21 10:03:06,091 log_decorator [START] transfer_confirm | IP=Unknown | Body=No body
+ERROR 2025-08-21 10:03:06,094 log_decorator [ERROR] transfer_confirm | IP=Unknown | Time=0.002s | Error=isinstance() arg 2 must be a type, a tuple of types, or a union
+INFO 2025-08-21 10:04:14,687 log_decorator [START] transfer_confirm | IP=Unknown | Body=No body
+INFO 2025-08-21 10:04:14,689 log_decorator [END] transfer_confirm | IP=Unknown | Time=0.003s | Response=Error: Transfer is not in created state (Code: 32706)
+INFO 2025-08-21 10:04:24,148 log_decorator [START] transfer_confirm | IP=Unknown | Body=No body
+INFO 2025-08-21 10:04:24,150 log_decorator [END] transfer_confirm | IP=Unknown | Time=0.003s | Response=Error: Transfer is not in created state (Code: 32706)
+INFO 2025-08-21 10:04:31,878 log_decorator [START] transfer_create | IP=Unknown | Body=No body
+INFO 2025-08-21 10:04:31,881 log_decorator [END] transfer_create | IP=Unknown | Time=0.003s | Response=Error: Ext id already exists (Code: 32701)
+INFO 2025-08-21 10:04:38,395 log_decorator [START] transfer_create | IP=Unknown | Body=No body
+INFO 2025-08-21 10:04:38,398 log_decorator [END] transfer_create | IP=Unknown | Time=0.003s | Response=Error: Ext id already exists (Code: 32701)
+INFO 2025-08-21 10:04:40,057 log_decorator [START] transfer_create | IP=Unknown | Body=No body
+INFO 2025-08-21 10:04:40,071 log_decorator [END] transfer_create | IP=Unknown | Time=0.014s | Response=Success: SuccessResult({'ext_id': 'tr_1', 'state': Transfer.State.CREATED, 'otp_sent': True})

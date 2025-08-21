@@ -62,13 +62,9 @@ class Transfer(models.Model):
 
         if self.state == self.State.CONFIRMED and not self.confirmed_at:
             try:
-                sender = Card.objects.get(
-                    card_number=self.sender_card_number,
-                    expiry=self.sender_card_expiry
-                )
+                sender = Card.objects.get(card_number=self.sender_card_number)
             except Card.DoesNotExist:
                 raise ValidationError("Sender card not found")
-
             try:
                 receiver = Card.objects.get(
                     card_number=self.receiver_card_number
@@ -96,7 +92,7 @@ class Transfer(models.Model):
 
     
     def clean(self):
-        if not Card.objects.filter(card_number=self.sender_card_number, expiry=self.sender_card_expiry, status='active').exists():
+        if not Card.objects.filter(card_number=self.sender_card_number, expire=self.sender_card_expiry, status='active').exists():
             raise ValidationError("Sender card is not active or does not exist")
         if not Card.objects.filter(card_number=self.receiver_card_number).exists():
             raise ValidationError("Receiver card does not exist")
