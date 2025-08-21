@@ -1,7 +1,8 @@
 # transfer/rpc.py
 from decimal import Decimal
+import json
 from jsonrpcserver import method, Success, Error as JsonRpcError
-
+from django.core.cache import cache
 from jsonrpcserver import method
 from core.models import Card, Transfer, Error
 from utils.helper import format_card, format_expire, generate_otp, send_telegram_message, get_transfer_by_ext_id
@@ -150,26 +151,46 @@ def transfer_cancel(ext_id):
 @log_request_response
 def transfer_state(ext_id):
     try:
+        cache_key = f"transfer_state:{ext_id}"
+        cached_result = cache.get(cache_key)
+        if cached_result:
+            print(f"\n\ncach key {cache_key}\n\n")
+            return cached_result
+        print(f'\n\ncache key {cache_key} \n\n')
         transfer = get_transfer_by_ext_id(ext_id)
         if not transfer:
             error = Error.objects.get(code=32701)
-            return JsonRpcError(code=error.code, message=str(error.en))
+            result = JsonRpcError(code=error.code, message=str(error.en))
+            cache.set(cache_key, result, timeout=30) 
+            return result
 
-        return Success({
+        result = Success({
             "ext_id": ext_id,
             "state": transfer.state
         })
 
+        cache.set(cache_key, result, timeout=30)
+        return result
+
     except Exception as e:
         print(f"[TRANSFER STATE EXCEPTION] {e}")
         error = Error.objects.get(code=32706)
-        return JsonRpcError(code=error.code, message=str(error.en))
-
+        result = JsonRpcError(code=error.code, message=str(error.en))
+        cache.set(cache_key, result, timeout=30)
+        return result
+    
+    
 @method
 @log_request_response
 def transfer_history(card_number, start_date=None, end_date=None, status=None):
     try:
         card_number = format_card(card_number)
+        cache_key = f"transfer_history:{card_number}:{start_date}:{end_date}:{status}"
+        cached_result = cache.get(cache_key)
+        if cached_result:
+            print(cache_key)
+            return Success(json.loads(cached_result))
+
         transfers = Transfer.objects.filter(
             Q(sender_card_number=card_number) | Q(receiver_card_number=card_number)
         )
@@ -180,17 +201,16 @@ def transfer_history(card_number, start_date=None, end_date=None, status=None):
             transfers = transfers.filter(created_at__lte=end_date)
         if status:
             transfers = transfers.filter(state=status)
-
         result = [
             {
                 "ext_id": t.ext_id,
                 "sending_amount": float(t.sending_amount),
-                "state": t.state,  # <- без .value
+                "state": t.state, 
                 "created_at": t.created_at.isoformat()
             }
             for t in transfers
         ]
-
+        cache.set(cache_key, json.dumps(result), timeout=30)
         return Success(result)
 
     except Exception as e:
