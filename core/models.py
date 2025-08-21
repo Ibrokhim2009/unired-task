@@ -17,7 +17,7 @@ class Card(models.Model):
         ("expired", "Expired")
     ]
     
-    card_number = models.CharField(_("Card number"), max_length=16, unique=True)
+    card_number = models.CharField(_("Card number"), max_length=16)
     expire = models.CharField(_("Card expire date"), max_length=5)
     phone = models.CharField(_("Phone number"), max_length=20, blank=True, null=True)
     status = models.CharField(_("Transfer status"), choices=STATUS_CHOICES)
@@ -49,7 +49,11 @@ class Transfer(models.Model):
     sending_amount = models.DecimalField(max_digits=15, decimal_places=2)
     currency = models.IntegerField(choices=((643, 'RUB'), (840, 'USD')))
     receiving_amount = models.DecimalField(max_digits=15, decimal_places=2)
-    state = models.CharField(max_length=20, choices=[], default=State.CREATED)
+    state = models.CharField(max_length=20, choices=[
+        ('created', 'Created'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled')
+    ], default=State.CREATED)
     try_count = models.IntegerField(default=0)
     otp = models.CharField(max_length=6, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
